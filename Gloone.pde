@@ -8,6 +8,8 @@ float circleY;
 float speedX;
 float speedY;
 int shots;
+int high_score;
+boolean is_high_score;
 
 enum State {
   START,
@@ -27,6 +29,7 @@ void setup() {
   logo = loadImage("logo.png");
   cursor_img = loadImage("cursor.png");
   cursor(cursor_img);
+  high_score = 0;
 }
 
 void draw() {
@@ -66,7 +69,7 @@ void draw() {
   }
   ellipse(circleX, circleY, 32, 32);
   textAlign(RIGHT);
-  fill(0, 0, 200);
+  fill(120, 0, 0);
   text(nf(shots), width - 5, 40);
   circleX = circleX + speedX;
   circleY = circleY + speedY;
@@ -90,12 +93,32 @@ void draw() {
     float d = sqrt(dx*dx + dy*dy);
     if (d < 32) {
       state = State.RESTART;
-      image(logo, width/2, 80, logo.width/2, logo.height/2);
+      image(logo, width/2, 70, logo.width/2, logo.height/2);
       textAlign(CENTER);
       fill(220, 200, 0);
-      text("Congratulations!", width/2, height/2 - 60);
       int score = int((2000 / shots) / (d + 2));
-      text("You scored " + nf(score) + "!", width/2, height/2 + 20);
+      String msg = "Congratulations!";
+      if (score == 0) msg = "Seriously?!?!";
+      else if (score < 10) msg = "At least you tried";
+      else if (score < 100) msg = "Well done";
+      else if (score == 10000) msg = "How?";
+      else if (score >= 300) msg = "Impressive!";
+      else if (score >= 1000) msg = "Fantastic!";
+      println("score: ", score);
+      println("high_score: ", high_score);
+      text(msg, width/2, height/2 - 80);
+      text("You scored " + nf(score), width/2, height/2 - 25);
+      if (score > high_score) is_high_score = true;
+      if (is_high_score) {
+        String msg2 = "High score!";
+        if (score < 50) {
+          msg2 = "High score";
+        }
+        text(msg2, width/2, height/2 + 30);
+        high_score = score;
+      } else {
+        text("High score: " + nf(high_score), width/2, height/2 + 30);
+      }
       stroke(220);
       strokeWeight(3);
       fill(30);
@@ -125,6 +148,7 @@ void mousePressed() {
       shots = 0;
     }
   } else if (state == State.READY) {
+    is_high_score = false;
     state = State.SHOOTING;
     shots = shots + 1;
     speedX = (mouseX - circleX) / 30;
