@@ -1,4 +1,5 @@
 PImage logo;
+PImage cursor_img;
 
 float goalX;
 float goalY;
@@ -24,13 +25,15 @@ void setup() {
   size(800, 450);
   state = State.START;
   logo = loadImage("logo.png");
+  cursor_img = loadImage("cursor.png");
+  cursor(cursor_img);
 }
 
 void draw() {
   rectMode(CENTER);
   imageMode(CENTER);
   textSize(40);
-  background(0, 80, 10);
+  background(0, 0, 40);
   if (state == State.START) {
     image(logo, width/2, height/2 - 50);
     stroke(220);
@@ -42,13 +45,25 @@ void draw() {
     text("Start", width/2, height/2 + 115);
     return;
   }
-  fill(150, 0, 0);
-  stroke(0, 40, 5);
-  strokeWeight(8);
+  fill(0, 0, 0);
+  stroke(150, 0, 0);
+  strokeWeight(3);
   ellipse(goalX, goalY, 32, 32);
+  strokeWeight(0);
+  for (int i = 31; i >= 0; i--) {
+    fill(255 - sqrt(i) * 8 * sqrt(32), 0, 0);
+    ellipse(goalX, goalY, i, i);
+  }
   fill(5);
-  stroke(128);
-  strokeWeight(1);
+  stroke(150);
+  strokeWeight(2);
+  float dx1 = mouseX - circleX, dy1 = mouseY - circleY;
+  float d1 = sqrt(dx1*dx1 + dy1*dy1);
+  if (state == State.READY && d1 > 0) {
+    dx1 = 24 * dx1 / d1;
+    dy1 = 24 * dy1 / d1;
+    line(circleX, circleY, circleX + dx1, circleY + dy1);
+  }
   ellipse(circleX, circleY, 32, 32);
   textAlign(RIGHT);
   fill(0, 0, 200);
@@ -75,11 +90,12 @@ void draw() {
     float d = sqrt(dx*dx + dy*dy);
     if (d < 32) {
       state = State.RESTART;
+      image(logo, width/2, 80, logo.width/2, logo.height/2);
       textAlign(CENTER);
       fill(220, 200, 0);
-      text("Congratulations!", width/2, height/2 - 100);
+      text("Congratulations!", width/2, height/2 - 60);
       int score = int((2000 / shots) / (d + 2));
-      text("You scored " + nf(score) + "!", width/2, height/2);
+      text("You scored " + nf(score) + "!", width/2, height/2 + 20);
       stroke(220);
       strokeWeight(3);
       fill(30);
